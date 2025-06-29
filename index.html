@@ -13,6 +13,7 @@
             --dark: #4b0082;
             --text: #333;
             --shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+            --error: #e74c3c;
         }
 
         * {
@@ -25,33 +26,37 @@
         body {
             background: linear-gradient(135deg, #e0e7ff 0%, #f9f0ff 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 15px;
             color: var(--text);
         }
 
         .container {
             max-width: 900px;
             margin: 0 auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         header {
             text-align: center;
-            padding: 30px 0;
+            padding: 20px 0 15px;
             animation: fadeInDown 1s ease;
         }
 
         header h1 {
             color: var(--dark);
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
 
         header p {
             color: var(--primary);
-            font-size: 1.2rem;
+            font-size: 1rem;
             max-width: 600px;
             margin: 0 auto;
+            line-height: 1.4;
         }
 
         .chat-container {
@@ -59,30 +64,33 @@
             border-radius: 20px;
             box-shadow: var(--shadow);
             overflow: hidden;
-            height: 65vh;
+            flex: 1;
             display: flex;
             flex-direction: column;
             animation: scaleUp 0.8s ease;
+            margin-bottom: 15px;
         }
 
         .chat-messages {
             flex: 1;
-            padding: 25px;
+            padding: 15px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
             background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="white"/><path d="M20,20 Q40,5 60,20 T100,20 M20,50 Q40,35 60,50 T100,50 M20,80 Q40,65 60,80 T100,80" stroke="%23f0f0f0" stroke-width="2" fill="none"/></svg>');
         }
 
         .message {
-            max-width: 80%;
-            padding: 18px 22px;
-            border-radius: 25px;
-            line-height: 1.6;
+            max-width: 85%;
+            padding: 15px 18px;
+            border-radius: 20px;
+            line-height: 1.5;
             position: relative;
             animation: fadeIn 0.5s ease;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            font-size: 0.95rem;
+            word-wrap: break-word;
         }
 
         .user-message {
@@ -112,17 +120,18 @@
 
         .input-container {
             display: flex;
-            padding: 20px;
+            padding: 15px;
             background: white;
             border-top: 1px solid #eee;
+            gap: 10px;
         }
 
         #user-input {
             flex: 1;
-            padding: 18px 25px;
+            padding: 14px 20px;
             border: 2px solid #e0e7ff;
-            border-radius: 50px;
-            font-size: 1.1rem;
+            border-radius: 30px;
+            font-size: 0.95rem;
             outline: none;
             transition: all 0.3s ease;
         }
@@ -136,19 +145,22 @@
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             border: none;
-            border-radius: 50px;
-            padding: 0 30px;
-            margin-left: 15px;
+            border-radius: 30px;
+            padding: 0 25px;
             cursor: pointer;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(106, 90, 205, 0.3);
+            box-shadow: 0 4px 10px rgba(106, 90, 205, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 80px;
         }
 
         #send-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(106, 90, 205, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(106, 90, 205, 0.4);
         }
 
         #send-btn:active {
@@ -158,14 +170,14 @@
         .loader {
             display: none;
             text-align: center;
-            padding: 20px;
+            padding: 15px;
         }
 
         .dot-flashing {
             position: relative;
-            width: 10px;
-            height: 10px;
-            border-radius: 5px;
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
             background-color: var(--primary);
             color: var(--primary);
             animation: dotFlashing 1s infinite linear alternate;
@@ -178,21 +190,21 @@
             display: inline-block;
             position: absolute;
             top: 0;
-            width: 10px;
-            height: 10px;
-            border-radius: 5px;
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
             background-color: var(--primary);
             color: var(--primary);
         }
 
         .dot-flashing::before {
-            left: -15px;
+            left: -12px;
             animation: dotFlashing 1s infinite alternate;
             animation-delay: 0s;
         }
 
         .dot-flashing::after {
-            left: 15px;
+            left: 12px;
             animation: dotFlashing 1s infinite alternate;
             animation-delay: 1s;
         }
@@ -203,49 +215,107 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-30px); }
+            from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes scaleUp {
-            from { opacity: 0; transform: scale(0.95); }
+            from { opacity: 0; transform: scale(0.97); }
             to { opacity: 1; transform: scale(1); }
         }
 
         .typing-indicator {
             background: white;
-            padding: 15px 25px;
-            border-radius: 25px;
+            padding: 12px 20px;
+            border-radius: 20px;
             display: inline-block;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin-bottom: 10px;
+            align-self: flex-start;
+            font-size: 0.95rem;
+            border: 1px solid #eee;
         }
 
         footer {
             text-align: center;
-            padding: 30px 0;
+            padding: 15px 0 10px;
             color: var(--primary);
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             animation: fadeIn 1.5s ease;
         }
 
+        .error-message {
+            background-color: #ffebee;
+            color: var(--error);
+            border: 1px solid #ffcdd2;
+            padding: 12px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        /* Адаптивность */
         @media (max-width: 768px) {
-            .chat-container {
-                height: 70vh;
+            body {
+                padding: 10px;
+            }
+            
+            header {
+                padding: 15px 0 10px;
+            }
+            
+            header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .chat-messages {
+                padding: 12px;
+                gap: 12px;
             }
             
             .message {
                 max-width: 90%;
-                padding: 15px 20px;
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .input-container {
+                padding: 12px;
+            }
+            
+            #user-input {
+                padding: 12px 16px;
+                font-size: 0.9rem;
             }
             
             #send-btn {
                 padding: 0 20px;
+                font-size: 0.9rem;
+                min-width: 70px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.3rem;
+            }
+            
+            header p {
+                font-size: 0.9rem;
+            }
+            
+            .message {
+                max-width: 95%;
+            }
+            
+            .ai-message::before {
+                display: none;
             }
         }
     </style>
@@ -277,13 +347,14 @@
         </main>
 
         <footer>
-            <p>Использует ZararaAI-v1 | Помните: ИИ не заменяет профессионального психолога</p>
+            <p>Использует ZararAI | Помните: ИИ не заменяет профессионального психолога</p>
         </footer>
     </div>
 
     <script>
         const API_URL = "https://api.deepseek.com/chat/completions";
-        const API_KEY = "sk-4f560a9c348747bcb94453d5e556d7e5"; // Вставьте ваш API ключ здесь
+        // Вставьте ваш API ключ сюда (получить на https://platform.deepseek.com/)
+        const API_KEY = "sk-c9e6aa2621544dc285e407f28fce3962"; 
         
         document.addEventListener('DOMContentLoaded', () => {
             const chatMessages = document.getElementById('chat-messages');
@@ -312,6 +383,7 @@
                 // Добавляем сообщение пользователя в чат
                 addMessageToChat(message, 'user');
                 userInput.value = '';
+                userInput.focus();
                 
                 // Показываем индикатор загрузки
                 loader.style.display = 'block';
@@ -324,7 +396,7 @@
                     simulateTyping(aiResponse);
                 } catch (error) {
                     console.error('Ошибка:', error);
-                    addMessageToChat('Извините, произошла ошибка. Пожалуйста, попробуйте снова.', 'ai');
+                    addMessageToChat(`Ошибка: ${error.message || 'Проверьте API ключ и подключение'}`, 'ai');
                 } finally {
                     // Скрываем индикатор загрузки
                     loader.style.display = 'none';
@@ -346,7 +418,8 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${API_KEY}`
+                        'Authorization': `Bearer ${API_KEY}`,
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({
                         model: "deepseek-chat",
@@ -369,7 +442,19 @@
                     })
                 });
                 
+                // Обработка HTTP ошибок
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`API Error: ${response.status} - ${errorData.error?.message || response.statusText}`);
+                }
+                
                 const data = await response.json();
+                
+                // Проверка структуры ответа
+                if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+                    throw new Error('Некорректный формат ответа от API');
+                }
+                
                 return data.choices[0].message.content;
             }
             
@@ -402,7 +487,7 @@
             function createFloatingShape() {
                 const shape = document.createElement('div');
                 shape.style.position = 'fixed';
-                shape.style.width = Math.random() * 100 + 50 + 'px';
+                shape.style.width = Math.random() * 60 + 30 + 'px';
                 shape.style.height = shape.style.width;
                 shape.style.background = `rgba(${Math.random() * 100}, ${Math.random() * 100}, ${Math.random() * 200 + 55}, 0.1)`;
                 shape.style.borderRadius = Math.random() > 0.5 ? '50%' : '30%';
@@ -419,8 +504,8 @@
             function animateShape(element) {
                 let x = parseInt(element.style.left);
                 let y = parseInt(element.style.top);
-                let xSpeed = (Math.random() - 0.5) * 2;
-                let ySpeed = (Math.random() - 0.5) * 2;
+                let xSpeed = (Math.random() - 0.5) * 1.5;
+                let ySpeed = (Math.random() - 0.5) * 1.5;
                 
                 function move() {
                     x += xSpeed;
