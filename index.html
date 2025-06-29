@@ -14,6 +14,7 @@
             --text: #333;
             --shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
             --error: #e74c3c;
+            --groq: #7b68ee;
         }
 
         * {
@@ -57,6 +58,15 @@
             max-width: 600px;
             margin: 0 auto;
             line-height: 1.4;
+        }
+
+        .api-info {
+            background: rgba(123, 104, 238, 0.1);
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin: 10px auto;
+            max-width: 600px;
+            font-size: 0.85rem;
         }
 
         .chat-container {
@@ -137,12 +147,12 @@
         }
 
         #user-input:focus {
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(147, 112, 219, 0.2);
+            border-color: var(--groq);
+            box-shadow: 0 0 0 3px rgba(123, 104, 238, 0.2);
         }
 
         #send-btn {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            background: linear-gradient(135deg, var(--groq) 0%, #5d43e6 100%);
             color: white;
             border: none;
             border-radius: 30px;
@@ -151,7 +161,7 @@
             font-size: 0.95rem;
             font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(106, 90, 205, 0.3);
+            box-shadow: 0 4px 10px rgba(123, 104, 238, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -160,7 +170,7 @@
 
         #send-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(106, 90, 205, 0.4);
+            box-shadow: 0 6px 15px rgba(123, 104, 238, 0.4);
         }
 
         #send-btn:active {
@@ -178,8 +188,8 @@
             width: 8px;
             height: 8px;
             border-radius: 4px;
-            background-color: var(--primary);
-            color: var(--primary);
+            background-color: var(--groq);
+            color: var(--groq);
             animation: dotFlashing 1s infinite linear alternate;
             animation-delay: 0.5s;
             margin: 0 auto;
@@ -193,8 +203,8 @@
             width: 8px;
             height: 8px;
             border-radius: 4px;
-            background-color: var(--primary);
-            color: var(--primary);
+            background-color: var(--groq);
+            color: var(--groq);
         }
 
         .dot-flashing::before {
@@ -210,7 +220,7 @@
         }
 
         @keyframes dotFlashing {
-            0% { background-color: var(--primary); }
+            0% { background-color: var(--groq); }
             50%, 100% { background-color: var(--accent); }
         }
 
@@ -287,17 +297,17 @@
             
             .input-container {
                 padding: 12px;
+                flex-direction: column;
             }
             
             #user-input {
-                padding: 12px 16px;
-                font-size: 0.9rem;
+                width: 100%;
+                margin-bottom: 10px;
             }
             
             #send-btn {
-                padding: 0 20px;
-                font-size: 0.9rem;
-                min-width: 70px;
+                width: 100%;
+                padding: 12px;
             }
         }
 
@@ -325,13 +335,16 @@
         <header>
             <h1>🧠 Психологический Ассистент</h1>
             <p>Глубокий диалог с оценкой вероятности ответов на базе ZararaAI</p>
+            <div class="api-info">
+                Использует ZararaAI
+            </div>
         </header>
 
         <main>
             <div class="chat-container">
                 <div class="chat-messages" id="chat-messages">
                     <div class="message ai-message">
-                        Привет! Я твой психологический ассистент. Можешь поделиться своими мыслями, чувствами или переживаниями. Я постараюсь помочь тебе разобраться в них, предлагая возможные точки зрения с указанием степени уверенности в ответах.
+                        Привет! Я твой психологический ассистент на базе ZararaAI. Можешь поделиться своими мыслями, чувствами или переживаниями. Я постараюсь помочь тебе разобраться в них, предлагая возможные точки зрения с указанием степени уверенности в ответах.
                     </div>
                 </div>
                 
@@ -347,14 +360,16 @@
         </main>
 
         <footer>
-            <p>Использует ZararAI | Помните: ИИ не заменяет профессионального психолога</p>
+            <p>Использует ZararaAI | Помните: ИИ не заменяет профессионального психолога</p>
         </footer>
     </div>
 
     <script>
-        const API_URL = "https://api.deepseek.com/chat/completions";
-        // Вставьте ваш API ключ сюда (получить на https://platform.deepseek.com/)
-        const API_KEY = "sk-c9e6aa2621544dc285e407f28fce3962"; 
+        // Groq API (бесплатный с лимитами)
+        const API_URL = "https://api.groq.com/openai/v1/chat/completions";
+        
+        // Получите бесплатный API ключ на https://console.groq.com/
+        const API_KEY = "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";
         
         document.addEventListener('DOMContentLoaded', () => {
             const chatMessages = document.getElementById('chat-messages');
@@ -419,10 +434,9 @@
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${API_KEY}`,
-                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({
-                        model: "deepseek-chat",
+                        model: "llama3-70b-8192", // Мощная модель Llama 3
                         messages: [
                             { 
                                 role: "system", 
