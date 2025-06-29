@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Психологический ассистент | DeepSeek-R1</title>
+    <style>
+        :root {
+            --primary: #6a5acd;
+            --secondary: #9370db;
+            --accent: #d8bfd8;
+            --light: #f5f5f5;
+            --dark: #4b0082;
+            --text: #333;
+            --shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f9f0ff 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            animation: fadeInDown 1s ease;
+        }
+
+        header h1 {
+            color: var(--dark);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header p {
+            color: var(--primary);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            height: 65vh;
+            display: flex;
+            flex-direction: column;
+            animation: scaleUp 0.8s ease;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="white"/><path d="M20,20 Q40,5 60,20 T100,20 M20,50 Q40,35 60,50 T100,50 M20,80 Q40,65 60,80 T100,80" stroke="%23f0f0f0" stroke-width="2" fill="none"/></svg>');
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 18px 22px;
+            border-radius: 25px;
+            line-height: 1.6;
+            position: relative;
+            animation: fadeIn 0.5s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background: white;
+            border: 1px solid #eee;
+            border-bottom-left-radius: 5px;
+            position: relative;
+        }
+
+        .ai-message::before {
+            content: "";
+            position: absolute;
+            left: -10px;
+            top: 15px;
+            border-width: 10px 15px 10px 0;
+            border-style: solid;
+            border-color: transparent white transparent transparent;
+        }
+
+        .input-container {
+            display: flex;
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 18px 25px;
+            border: 2px solid #e0e7ff;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        #user-input:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(147, 112, 219, 0.2);
+        }
+
+        #send-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0 30px;
+            margin-left: 15px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(106, 90, 205, 0.3);
+        }
+
+        #send-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(106, 90, 205, 0.4);
+        }
+
+        #send-btn:active {
+            transform: translateY(0);
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .dot-flashing {
+            position: relative;
+            width: 10px;
+            height: 10px;
+            border-radius: 5px;
+            background-color: var(--primary);
+            color: var(--primary);
+            animation: dotFlashing 1s infinite linear alternate;
+            animation-delay: 0.5s;
+            margin: 0 auto;
+        }
+
+        .dot-flashing::before, .dot-flashing::after {
+            content: '';
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 5px;
+            background-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .dot-flashing::before {
+            left: -15px;
+            animation: dotFlashing 1s infinite alternate;
+            animation-delay: 0s;
+        }
+
+        .dot-flashing::after {
+            left: 15px;
+            animation: dotFlashing 1s infinite alternate;
+            animation-delay: 1s;
+        }
+
+        @keyframes dotFlashing {
+            0% { background-color: var(--primary); }
+            50%, 100% { background-color: var(--accent); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scaleUp {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .typing-indicator {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            display: inline-block;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: var(--primary);
+            font-size: 0.9rem;
+            animation: fadeIn 1.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 70vh;
+            }
+            
+            .message {
+                max-width: 90%;
+                padding: 15px 20px;
+            }
+            
+            #send-btn {
+                padding: 0 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 Психологический Ассистент</h1>
+            <p>Глубокий диалог с оценкой вероятности ответов на базе DeepSeek-R1</p>
+        </header>
+
+        <main>
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message ai-message">
+                        Привет! Я твой психологический ассистент. Можешь поделиться своими мыслями, чувствами или переживаниями. Я постараюсь помочь тебе разобраться в них, предлагая возможные точки зрения с указанием степени уверенности в ответах.
+                    </div>
+                </div>
+                
+                <div class="loader" id="loader">
+                    <div class="dot-flashing"></div>
+                </div>
+                
+                <div class="input-container">
+                    <input type="text" id="user-input" placeholder="Напишите ваше сообщение..." autocomplete="off">
+                    <button id="send-btn">Отправить</button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Использует DeepSeek-R1 API | Помните: ИИ не заменяет профессионального психолога</p>
+        </footer>
+    </div>
+
+    <script>
+        const API_URL = "https://api.deepseek.com/chat/completions";
+        const API_KEY = ""; // Вставьте ваш API ключ здесь
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatMessages = document.getElementById('chat-messages');
+            const userInput = document.getElementById('user-input');
+            const sendBtn = document.getElementById('send-btn');
+            const loader = document.getElementById('loader');
+            
+            // Фокус на поле ввода при загрузке
+            userInput.focus();
+            
+            // Отправка сообщения по клику
+            sendBtn.addEventListener('click', sendMessage);
+            
+            // Отправка сообщения по Enter
+            userInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            async function sendMessage() {
+                const message = userInput.value.trim();
+                if (!message) return;
+                
+                // Добавляем сообщение пользователя в чат
+                addMessageToChat(message, 'user');
+                userInput.value = '';
+                
+                // Показываем индикатор загрузки
+                loader.style.display = 'block';
+                
+                try {
+                    // Получаем ответ от ИИ
+                    const aiResponse = await getAIResponse(message);
+                    
+                    // Имитируем "печатание" для естественности
+                    simulateTyping(aiResponse);
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    addMessageToChat('Извините, произошла ошибка. Пожалуйста, попробуйте снова.', 'ai');
+                } finally {
+                    // Скрываем индикатор загрузки
+                    loader.style.display = 'none';
+                }
+            }
+            
+            function addMessageToChat(message, sender) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message');
+                messageElement.classList.add(sender + '-message');
+                messageElement.textContent = message;
+                
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            async function getAIResponse(userMessage) {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: "deepseek-chat",
+                        messages: [
+                            { 
+                                role: "system", 
+                                content: "Ты психологический ассистент. Отвечай на русском. " +
+                                         "Давай глубокие, эмпатичные ответы. Оценивай вероятность своих предположений. " +
+                                         "Избегай категоричных утверждений. Используй фразы: 'Возможно...', 'Вероятно...', " +
+                                         "'Есть основания предположить...'. Помни, что ты не заменяешь психолога."
+                            },
+                            { role: "user", content: userMessage }
+                        ],
+                        temperature: 0.7,
+                        max_tokens: 2000,
+                        top_p: 1,
+                        frequency_penalty: 0,
+                        presence_penalty: 0,
+                        stop: null
+                    })
+                });
+                
+                const data = await response.json();
+                return data.choices[0].message.content;
+            }
+            
+            function simulateTyping(text) {
+                const typingIndicator = document.createElement('div');
+                typingIndicator.classList.add('typing-indicator');
+                typingIndicator.id = 'typing-indicator';
+                chatMessages.appendChild(typingIndicator);
+                
+                let i = 0;
+                const speed = 20; // Скорость печати (меньше = быстрее)
+                
+                function typeWriter() {
+                    if (i < text.length) {
+                        typingIndicator.textContent = text.substring(0, i + 1);
+                        i++;
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                        setTimeout(typeWriter, speed);
+                    } else {
+                        // Заменяем индикатор на финальное сообщение
+                        typingIndicator.remove();
+                        addMessageToChat(text, 'ai');
+                    }
+                }
+                
+                typeWriter();
+            }
+            
+            // Анимация фона для релаксации
+            function createFloatingShape() {
+                const shape = document.createElement('div');
+                shape.style.position = 'fixed';
+                shape.style.width = Math.random() * 100 + 50 + 'px';
+                shape.style.height = shape.style.width;
+                shape.style.background = `rgba(${Math.random() * 100}, ${Math.random() * 100}, ${Math.random() * 200 + 55}, 0.1)`;
+                shape.style.borderRadius = Math.random() > 0.5 ? '50%' : '30%';
+                shape.style.top = Math.random() * 100 + 'vh';
+                shape.style.left = Math.random() * 100 + 'vw';
+                shape.style.zIndex = '-1';
+                shape.style.pointerEvents = 'none';
+                document.body.appendChild(shape);
+                
+                // Анимация движения
+                animateShape(shape);
+            }
+            
+            function animateShape(element) {
+                let x = parseInt(element.style.left);
+                let y = parseInt(element.style.top);
+                let xSpeed = (Math.random() - 0.5) * 2;
+                let ySpeed = (Math.random() - 0.5) * 2;
+                
+                function move() {
+                    x += xSpeed;
+                    y += ySpeed;
+                    
+                    // Отскок от границ экрана
+                    if (x <= 0 || x >= window.innerWidth - parseInt(element.style.width)) {
+                        xSpeed *= -1;
+                    }
+                    if (y <= 0 || y >= window.innerHeight - parseInt(element.style.height)) {
+                        ySpeed *= -1;
+                    }
+                    
+                    element.style.left = x + 'px';
+                    element.style.top = y + 'px';
+                    
+                    requestAnimationFrame(move);
+                }
+                
+                move();
+            }
+            
+            // Создаем плавающие элементы для фона
+            for (let i = 0; i < 5; i++) {
+                setTimeout(createFloatingShape, i * 1000);
+            }
+        });
+    </script>
+</body>
+</html>
